@@ -84,11 +84,17 @@ public class WebCreator extends NanoHTTPD {
                     }
                     cards.append("</select>");
                 } else if (setting.type == SettingType.NUMERIC) {
-                    cards.append("<input type=\"number\" class=\"numeric-input\" id=\"")
+                    cards.append("<div class=\"numeric-wrapper\" id=\"")
+                            .append(setting.title.replace(" ", "_")).append("Wrapper\">")
+                            .append("<input type=\"number\" class=\"numeric-input\" id=\"")
                             .append(setting.title.replace(" ", "_")).append("Input\" value=\"")
-                            .append(setting.minNumeric).append("\" min=\"")
-                            .append(setting.maxNumeric).append("\" max=\"")
-                            .append(setting.numericValue).append("\">");
+                            .append(setting.numericValue).append("\" min=\"")
+                            .append(setting.minNumeric).append("\" max=\"")
+                            .append(setting.maxNumeric).append("\" readonly>")
+                            .append("<div class=\"numeric-buttons\">")
+                            .append("<span class=\"numeric-up\"></span>")
+                            .append("<span class=\"numeric-down\"></span>")
+                            .append("</div></div>");
                 }
 
                 cards.append("</div>").append("</div>");

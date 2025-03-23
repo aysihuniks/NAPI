@@ -51,9 +51,15 @@
         .custom-select::-webkit-scrollbar{width:8px}
         .custom-select::-webkit-scrollbar-thumb{background:#00d4ff;border-radius:4px}
         .custom-select::-webkit-scrollbar-track{background:#1c1c1c}
-        .numeric-input{background-color:#252525;border:2px solid #404040;color:#fff;border-radius:6px;padding:8px;width:100%;max-width:200px;margin:0 auto;font-family:'Poppins',sans-serif;text-align:center}
+        .numeric-wrapper{position:relative;display:inline-block;width:100%;max-width:200px;margin:0 auto}
+        .numeric-input{background-color:#252525;border:2px solid #404040;color:#fff;border-radius:6px;padding:8px 30px 8px 10px;width:100%;font-family:'Poppins',sans-serif;text-align:center;-webkit-appearance:none;-moz-appearance:textfield}
         .numeric-input:focus{border-color:#00d4ff;outline:none;box-shadow:0 0 8px rgba(0,212,255,0.6)}
-        .numeric-input::-webkit-inner-spin-button, .numeric-input::-webkit-outer-spin-button{opacity:1}
+        .numeric-input::-webkit-inner-spin-button,.numeric-input::-webkit-outer-spin-button{-webkit-appearance:none;margin:0}
+        .numeric-buttons{position:absolute;right:5px;top:50%;transform:translateY(-50%);display:flex;flex-direction:column;gap:2px}
+        .numeric-up,.numeric-down{width:20px;height:10px;cursor:pointer}
+        .numeric-up{background-image:url('data:image/svg+xml;utf8,<svg fill="%23e0e0e0" height="10" viewBox="0 0 24 24" width="20" xmlns="http://www.w3.org/2000/svg"><path d="M7 14l5-5 5 5z"/></svg>');background-repeat:no-repeat;background-position:center}
+        .numeric-down{background-image:url('data:image/svg+xml;utf8,<svg fill="%23e0e0e0" height="10" viewBox="0 0 24 24" width="20" xmlns="http://www.w3.org/2000/svg"><path d="M7 10l5 5 5-5z"/></svg>');background-repeat:no-repeat;background-position:center;transform:rotate(180deg)}
+        .numeric-up:hover,.numeric-down:hover{background-image:url('data:image/svg+xml;utf8,<svg fill="%2300d4ff" height="10" viewBox="0 0 24 24" width="20" xmlns="http://www.w3.org/2000/svg"><path d="M7 14l5-5 5 5z"/></svg>')}
         @media (max-width: 768px) { .navbar { padding: 15px 20px; } .navbar-left { flex-direction: column; align-items: flex-start; } .card-container { flex-direction: column; align-items: center; } }
     </style>
 </head>
@@ -138,8 +144,33 @@
                 resetBtn.classList.toggle('show', hasChanges);
             });
         });
+
+        document.querySelectorAll('.numeric-wrapper').forEach(wrapper => {
+            const input = wrapper.querySelector('.numeric-input');
+            const upBtn = wrapper.querySelector('.numeric-up');
+            const downBtn = wrapper.querySelector('.numeric-down');
+            const min = parseInt(input.min);
+            const max = parseInt(input.max);
+
+            upBtn.addEventListener('click', () => {
+                let value = parseInt(input.value);
+                if (value < max) {
+                    input.value = value + 1;
+                    input.dispatchEvent(new Event('change'));
+                }
+            });
+
+            downBtn.addEventListener('click', () => {
+                let value = parseInt(input.value);
+                if (value > min) {
+                    input.value = value - 1;
+                    input.dispatchEvent(new Event('change'));
+                }
+            });
+        });
     });
 </script>
+
 <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.8/dist/umd/popper.min.js" integrity="sha384-I7E8VVD/ismYTF4hNIPjVp/Zjvgyol6VFvRkX/vR+Vc4jQkC+hVqc2pM8ODewa9r" crossorigin="anonymous"></script>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.min.js" integrity="sha384-0pUGZvbkm6XF6gxjEnlmuGrJXVbNuzT9qBBavbLwCsOGabYfZo0T0to5eqruptLy" crossorigin="anonymous"></script>
 </body>
