@@ -24,10 +24,15 @@ public final class NAPI {
             if (webCreator != null && webCreator.isAlive()) {
                 Util.log("Web Creator closing...");
                 webCreator.stop();
+                try {
+                    Thread.sleep(500);
+                } catch (InterruptedException e) {
+                    Util.log("Port ");
+                }
             }
 
             try {
-                webCreator = new WebCreator();
+                webCreator = new WebCreator(plugin);
                 Util.log("Web Creator started on https://" + Bukkit.getIp() + ":8080/");
             } catch (IOException e) {
                 Util.log("Web Creator failed to start.");

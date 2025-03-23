@@ -23,7 +23,7 @@ public class Setting {
 
     public static void add(String title, String description, String type, Object value) {
         settings.add(new Setting(title, description, type, value));
-        Util.log("Yeni ayar eklendi: " + title);
+        Util.log("New setting added: " + title);
     }
 
     public static List<Setting> getSettings() {
