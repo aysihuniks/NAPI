@@ -1,6 +1,8 @@
 package nesoi.network.api.web;
 
 import fi.iki.elonen.NanoHTTPD;
+import nesoi.network.api.enumeration.SettingType;
+import nesoi.network.api.model.Setting;
 import org.bukkit.Bukkit;
 import org.bukkit.plugin.Plugin;
 import org.nandayo.DAPI.Util;
@@ -57,15 +59,15 @@ public class WebCreator extends NanoHTTPD {
                         .append("<div class=\"card-content\">")
                         .append("<p>").append(setting.description).append("</p>");
 
-                if (setting.type.equals("string")) {
+                if (setting.type == SettingType.INPUT) {
                     cards.append("<input type=\"text\" class=\"form-control\" id=\"")
-                            .append(setting.title.replace(" ", "_")).append("Input\" value=\"")
-                            .append(setting.value).append("\">");
-                } else if (setting.type.equals("boolean")) {
+                            .append(setting.title.replace(" ", "_")).append("Input\" placeholder=\"")
+                            .append(setting.placeholder != null ? setting.placeholder : "").append("\">");
+                } else if (setting.type == SettingType.CHECKBOX) {
                     cards.append("<div class=\"form-check form-switch\">")
                             .append("<input class=\"form-check-input toggle-input\" type=\"checkbox\" id=\"")
                             .append(setting.title.replace(" ", "_")).append("\"")
-                            .append(((Boolean) setting.value) ? " checked" : "").append(">")
+                            .append(setting.value != null && setting.value ? " checked" : "").append(">")
                             .append("<label class=\"form-check-label\" for=\"")
                             .append(setting.title.replace(" ", "_")).append("\"></label>")
                             .append("</div>");
@@ -80,4 +82,5 @@ public class WebCreator extends NanoHTTPD {
 
         return newFixedLengthResponse("404 - Undefined");
     }
+
 }
