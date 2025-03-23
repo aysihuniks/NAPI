@@ -18,6 +18,7 @@ public class WebCreator extends NanoHTTPD {
         super(8080);
         this.plugin = plugin;
         start(SOCKET_READ_TIMEOUT, false);
+        Util.log("&aWeb Creator started on https://" + Bukkit.getIp() + ":8080/");
     }
 
     @Override

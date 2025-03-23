@@ -16,7 +16,7 @@ public final class NAPI {
 
     private static WebCreator webCreator;
 
-    public NAPI(Plugin plugin) {
+    public NAPI(Plugin plugin, Setting... settings) {
         instance = this;
         this.plugin = plugin;
 
@@ -25,25 +25,23 @@ public final class NAPI {
 
             try {
                 webCreator = new WebCreator(plugin);
-                Util.log("Web Creator started on https://" + Bukkit.getIp() + ":8080/");
+
+                for (Setting setting : settings) {
+                    Setting.add(setting.title, setting.description, setting.type,
+                            setting.type == SettingType.INPUT ? setting.placeholder : setting.value);
+                }
+
+                Util.log("Loaded " + Setting.getSettings().size() + " settings: " +
+                        String.join(", ", Setting.getSettings().stream().map(s -> s.title).toList()));
             } catch (IOException e) {
-                Util.log("Error occurred while starting NAPI: " + e.getMessage());
+                Util.log("&cError occurred while starting NAPI: " + e.getMessage());
             }
         }
     }
 
-    public NAPI add(String title, String description, SettingType type, Object value) {
-        if (type == SettingType.INPUT && value instanceof String) {
-            Setting.add(title, description, SettingType.INPUT, value);
-        } else if (type == SettingType.CHECKBOX && value instanceof Boolean) {
-            Setting.add(title, description, SettingType.CHECKBOX, value);
-        }
-        return this;
-    }
-
     public void disable() {
         if (webCreator != null && webCreator.isAlive()) {
-            Util.log("Web Creator shutting down...");
+            Util.log("&6Web Creator shutting down...");
             webCreator.stop();
             webCreator = null;
         }
