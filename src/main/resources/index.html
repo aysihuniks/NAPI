@@ -44,10 +44,13 @@
         .save-btn { background: linear-gradient(135deg, #5cff77, #00cc44); color: #fff; right: 30px; }
         .reset-btn { background: linear-gradient(135deg, #ff5c5c, #cc0000); color: #fff; right: 150px; }
         .save-btn:hover, .reset-btn:hover { cursor: pointer; transform: scale(1.05); box-shadow: 0 6px 18px rgba(0, 0, 0, 0.6); }
-        .custom-select { background-color: #252525; border: 1px solid #404040; color: #ffffff; border-radius: 6px; padding: 8px; width: 100%; max-width: 200px; margin: 0 auto; font-family: 'Poppins', sans-serif; appearance: none; background-image: url('data:image/svg+xml;utf8,<svg fill="%23e0e0e0" height="24" viewBox="0 0 24 24" width="24" xmlns="http://www.w3.org/2000/svg"><path d="M7 10l5 5 5-5z"/></svg>'); background-repeat: no-repeat; background-position: right 10px center; cursor: pointer; transition: border-color 0.3s ease, box-shadow 0.3s ease; }
-        .custom-select:hover { border-color: #00d4ff; }
-        .custom-select:focus { border-color: #00d4ff; outline: none; box-shadow: 0 0 5px rgba(0, 212, 255, 0.5); }
-        .custom-select option { background-color: #1c1c1c; color: #e0e0e0; }
+        .custom-select{background-color:#252525;border:2px solid #404040;color:#fff;border-radius:6px;padding:8px 30px 8px 10px;width:100%;max-width:200px;margin:0 auto;font-family:'Poppins',sans-serif;appearance:none;background-image:url('data:image/svg+xml;utf8,<svg fill="%23e0e0e0" height="24" viewBox="0 0 24 24" width="24" xmlns="http://www.w3.org/2000/svg"><path d="M7 10l5 5 5-5z"/></svg>');background-repeat:no-repeat;background-position:right 10px center;cursor:pointer;transition:border-color 0.3s ease,box-shadow 0.3s ease}
+        .custom-select:hover{border-color:#00d4ff}
+        .custom-select:focus{border-color:#00d4ff;outline:none;box-shadow:0 0 8px rgba(0,212,255,0.6)}
+        .custom-select option{background-color:#252525;color:#e0e0e0;padding:10px;border:none;font-size:14px;border-bottom:1px solid #404040}
+        .custom-select::-webkit-scrollbar{width:8px}
+        .custom-select::-webkit-scrollbar-thumb{background:#00d4ff;border-radius:4px}
+        .custom-select::-webkit-scrollbar-track{background:#1c1c1c}
         @media (max-width: 768px) { .navbar { padding: 15px 20px; } .navbar-left { flex-direction: column; align-items: flex-start; } .card-container { flex-direction: column; align-items: center; } }
     </style>
 </head>
@@ -89,7 +92,7 @@
 <script>
     document.getElementById('saveButton').addEventListener('click', function() {
         const settings = {};
-        document.querySelectorAll('.form-control, .form-check-input').forEach(input => {
+        document.querySelectorAll('.form-control, .form-check-input, .custom-select').forEach(input => {
             const key = input.id.replace('Input', '').replace('_', ' ');
             settings[key] = input.type === 'checkbox' ? input.checked : input.value;
         });
@@ -115,7 +118,7 @@
     document.addEventListener("DOMContentLoaded", function () {
         const saveBtn = document.querySelector(".save-btn");
         const resetBtn = document.querySelector(".reset-btn");
-        const inputs = document.querySelectorAll('.form-control, .form-check-input');
+        const inputs = document.querySelectorAll('.form-control, .form-check-input, .custom-select');
 
         const initialValues = new Map();
         inputs.forEach(input => {
