@@ -72,6 +72,17 @@ public class WebCreator extends NanoHTTPD {
                             .append("<label class=\"form-check-label\" for=\"")
                             .append(setting.title.replace(" ", "_")).append("\"></label>")
                             .append("</div>");
+                } else if (setting.type == SettingType.COMBOBOX) {
+                    cards.append("<select class=\"custom-select\" id=\"")
+                            .append(setting.title.replace(" ", "_")).append("Input\">");
+                    if (setting.data != null) {
+                        for (int i = 0; i < setting.data.size(); i++) {
+                            cards.append("<option value=\"").append(setting.data.get(i)).append("\"")
+                                    .append(i == setting.index ? " selected" : "").append(">")
+                                    .append(setting.data.get(i)).append("</option>");
+                        }
+                    }
+                    cards.append("</select>");
                 }
 
                 cards.append("</div>").append("</div>");
