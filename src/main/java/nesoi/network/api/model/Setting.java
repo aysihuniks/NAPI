@@ -16,17 +16,17 @@ public class Setting {
 
     public Boolean value;
     public String placeholder;
-
     public List<String> data;
-    public int index;
+    public int startingIndex;
 
     public Setting(String title, String description, String placeholder) {
         this.title = title;
         this.description = description;
         this.type = SettingType.INPUT;
         this.placeholder = placeholder;
-
         this.value = null;
+        this.data = null;
+        this.startingIndex = -1;
     }
 
     public Setting(String title, String description, Boolean value) {
@@ -34,9 +34,9 @@ public class Setting {
         this.description = description;
         this.type = SettingType.CHECKBOX;
         this.value = value;
-
         this.placeholder = null;
-
+        this.data = null;
+        this.startingIndex = -1;
     }
 
     public Setting(String title, String description, List<String> data, int startingIndex) {
@@ -44,7 +44,7 @@ public class Setting {
         this.description = description;
         this.type = SettingType.COMBOBOX;
         this.data = data;
-        this.index = (startingIndex >= 0 && startingIndex < data.size()) ? startingIndex : 0;
+        this.startingIndex = (startingIndex >= 0 && startingIndex < data.size()) ? startingIndex : 0;
         this.value = null;
         this.placeholder = null;
     }
@@ -62,7 +62,7 @@ public class Setting {
                 settings.add(new Setting(title, description, data, 0));
                 Util.log("New setting added: " + title + " (combobox)");
             } catch (ClassCastException e) {
-                Util.log("&cIncorrect data type for COMBOBOX: " + title + " - waiting List<String>");
+                Util.log("&cIncorrect data type for COMBOBOX: " + title + " - waiting List<String> ");
             }
         } else {
             Util.log("&cIncorrect setting type " + type + " for setting " + title);
@@ -72,5 +72,4 @@ public class Setting {
     public static List<Setting> getSettings() {
         return settings;
     }
-
 }

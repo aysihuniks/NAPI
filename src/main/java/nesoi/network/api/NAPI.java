@@ -27,8 +27,8 @@ public final class NAPI {
                 webCreator = new WebCreator(plugin);
 
                 for (Setting setting : settings) {
-                    Setting.add(setting.title, setting.description, setting.type,
-                            setting.type == SettingType.INPUT ? setting.placeholder : setting.value);
+                    Setting.getSettings().add(setting);
+                    Util.log("New setting added: " + setting.title + " (" + setting.type.toString().toLowerCase() + ")");
                 }
 
                 Util.log("Loaded " + Setting.getSettings().size() + " settings: " +

@@ -78,7 +78,7 @@ public class WebCreator extends NanoHTTPD {
                     if (setting.data != null) {
                         for (int i = 0; i < setting.data.size(); i++) {
                             cards.append("<option value=\"").append(setting.data.get(i)).append("\"")
-                                    .append(i == setting.index ? " selected" : "").append(">")
+                                    .append(i == setting.startingIndex ? " selected" : "").append(">")
                                     .append(setting.data.get(i)).append("</option>");
                         }
                     }
