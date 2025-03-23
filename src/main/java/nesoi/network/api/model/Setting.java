@@ -10,43 +10,74 @@ public class Setting {
 
     private static final List<Setting> settings = new ArrayList<>();
 
-    public String title;
-    public String description;
-    public SettingType type;
+    public String title; // GENERAL
+    public String description; // GENERAL
+    public SettingType type; // GENERAL
 
-    public Boolean value;
-    public String placeholder;
-    public List<String> data;
-    public int startingIndex;
+    public Boolean checkboxValue; // CHECKBOX
+    public String inputPlaceholder; // INPUT
 
+    public List<String> comboData; // COMBOBOX
+    public Integer comboIndex; // COMBOBOX
+
+    public Integer numericValue; // NumericUpDown
+    public Integer maxNumeric; // NumericUpDown
+    public Integer minNumeric; // NumericUpDown
+
+
+    // INPUT Constructor
     public Setting(String title, String description, String placeholder) {
         this.title = title;
         this.description = description;
         this.type = SettingType.INPUT;
-        this.placeholder = placeholder;
-        this.value = null;
-        this.data = null;
-        this.startingIndex = -1;
+        this.inputPlaceholder = placeholder;
+        this.checkboxValue = null;
+        this.comboData = null;
+        this.comboIndex = -1;
+        this.numericValue = null;
+        this.minNumeric = null;
+        this.maxNumeric = null;
     }
 
+    // CHECKBOX Constructor
     public Setting(String title, String description, Boolean value) {
         this.title = title;
         this.description = description;
         this.type = SettingType.CHECKBOX;
-        this.value = value;
-        this.placeholder = null;
-        this.data = null;
-        this.startingIndex = -1;
+        this.checkboxValue = value;
+        this.inputPlaceholder = null;
+        this.comboData = null;
+        this.comboIndex = -1;
+        this.numericValue = null;
+        this.minNumeric = null;
+        this.maxNumeric = null;
     }
 
+    // COMBOBOX Constructor
     public Setting(String title, String description, List<String> data, int startingIndex) {
         this.title = title;
         this.description = description;
         this.type = SettingType.COMBOBOX;
-        this.data = data;
-        this.startingIndex = (startingIndex >= 0 && startingIndex < data.size()) ? startingIndex : 0;
-        this.value = null;
-        this.placeholder = null;
+        this.comboData = data;
+        this.comboIndex = (startingIndex >= 0 && startingIndex < data.size()) ? startingIndex : 0;
+        this.checkboxValue = null;
+        this.inputPlaceholder = null;
+        this.numericValue = null;
+        this.minNumeric = null;
+        this.maxNumeric = null;
+    }
+
+    public Setting(String title, String description, int value, int minValue, int maxValue) {
+        this.title = title;
+        this.description = description;
+        this.type = SettingType.NUMERIC;
+        this.numericValue = value;
+        this.minNumeric = minValue;
+        this.maxNumeric = maxValue;
+        this.checkboxValue = null;
+        this.inputPlaceholder = null;
+        this.comboData = null;
+        this.comboIndex = -1;
     }
 
     public static void add(String title, String description, SettingType type, Object value) {
@@ -62,7 +93,15 @@ public class Setting {
                 settings.add(new Setting(title, description, data, 0));
                 Util.log("New setting added: " + title + " (combobox)");
             } catch (ClassCastException e) {
-                Util.log("&cIncorrect data type for COMBOBOX: " + title + " - waiting List<String> ");
+                Util.log("&cIncorrect data type for COMBOBOX: " + title + " - List<String> bekleniyor");
+            }
+        } else if (type == SettingType.NUMERIC && value instanceof Integer[]) {
+            Integer[] numericData = (Integer[]) value;
+            if (numericData.length == 3) {
+                settings.add(new Setting(title, description, numericData[0], numericData[1], numericData[2]));
+                Util.log("New setting added: " + title + " (numeric up down)");
+            } else {
+                Util.log("&cIncorrect data for NUMERIC_UP_DOWN: " + title + " - [value, min, max] bekleniyor");
             }
         } else {
             Util.log("&cIncorrect setting type " + type + " for setting " + title);

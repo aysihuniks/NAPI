@@ -63,26 +63,32 @@ public class WebCreator extends NanoHTTPD {
                 if (setting.type == SettingType.INPUT) {
                     cards.append("<input type=\"text\" class=\"form-control\" id=\"")
                             .append(setting.title.replace(" ", "_")).append("Input\" placeholder=\"")
-                            .append(setting.placeholder != null ? setting.placeholder : "").append("\">");
+                            .append(setting.inputPlaceholder != null ? setting.inputPlaceholder : "").append("\">");
                 } else if (setting.type == SettingType.CHECKBOX) {
                     cards.append("<div class=\"form-check form-switch\">")
                             .append("<input class=\"form-check-input toggle-input\" type=\"checkbox\" id=\"")
                             .append(setting.title.replace(" ", "_")).append("\"")
-                            .append(setting.value != null && setting.value ? " checked" : "").append(">")
+                            .append(setting.checkboxValue != null && setting.checkboxValue ? " checked" : "").append(">")
                             .append("<label class=\"form-check-label\" for=\"")
                             .append(setting.title.replace(" ", "_")).append("\"></label>")
                             .append("</div>");
                 } else if (setting.type == SettingType.COMBOBOX) {
                     cards.append("<select class=\"custom-select\" id=\"")
                             .append(setting.title.replace(" ", "_")).append("Input\">");
-                    if (setting.data != null) {
-                        for (int i = 0; i < setting.data.size(); i++) {
-                            cards.append("<option value=\"").append(setting.data.get(i)).append("\"")
-                                    .append(i == setting.startingIndex ? " selected" : "").append(">")
-                                    .append(setting.data.get(i)).append("</option>");
+                    if (setting.comboData != null) {
+                        for (int i = 0; i < setting.comboData.size(); i++) {
+                            cards.append("<option value=\"").append(setting.comboData.get(i)).append("\"")
+                                    .append(i == setting.comboIndex ? " selected" : "").append(">")
+                                    .append(setting.comboData.get(i)).append("</option>");
                         }
                     }
                     cards.append("</select>");
+                } else if (setting.type == SettingType.NUMERIC) {
+                    cards.append("<input type=\"number\" class=\"numeric-input\" id=\"")
+                            .append(setting.title.replace(" ", "_")).append("Input\" value=\"")
+                            .append(setting.minNumeric).append("\" min=\"")
+                            .append(setting.maxNumeric).append("\" max=\"")
+                            .append(setting.numericValue).append("\">");
                 }
 
                 cards.append("</div>").append("</div>");
