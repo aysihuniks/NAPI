@@ -26,7 +26,6 @@ public final class NAPI {
             try {
                 webCreator = new WebCreator(plugin);
                 Util.log("Web Creator started on https://" + Bukkit.getIp() + ":8080/");
-                Util.log("Loaded " + Setting.getSettings().size() + " settings: " + String.join(", ", Setting.getSettings().stream().map(s -> s.title).toList()));
             } catch (IOException e) {
                 Util.log("Error occurred while starting NAPI: " + e.getMessage());
             }
@@ -42,7 +41,7 @@ public final class NAPI {
         return this;
     }
 
-    public static void disable() {
+    public void disable() {
         if (webCreator != null && webCreator.isAlive()) {
             Util.log("Web Creator shutting down...");
             webCreator.stop();

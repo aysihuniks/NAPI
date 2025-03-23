@@ -46,6 +46,7 @@ public class Setting {
         } else {
             Util.log("Incorrect setting type " + type + " for setting " + title );
         }
+        Util.log("Loaded " + Setting.getSettings().size() + " settings: " + String.join(", ", settings.stream().map(s -> s.title).toList()));
     }
 
     public static List<Setting> getSettings() {
