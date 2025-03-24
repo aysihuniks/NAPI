@@ -10,6 +10,7 @@ import org.nandayo.DAPI.Util;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
+import java.util.function.Consumer;
 
 public class WebCreator extends NanoHTTPD {
 
@@ -95,10 +96,16 @@ public class WebCreator extends NanoHTTPD {
                             case INPUT:
                                 String newPlaceholder = newValue.toString();
                                 oldValueStr = setting.inputPlaceholder != null ? setting.inputPlaceholder : "";
-                                if (!newPlaceholder.equals(oldValueStr)) {
+                                if (!newPlaceholder.isEmpty() && !newPlaceholder.equals(oldValueStr)) {
                                     setting.inputPlaceholder = newPlaceholder;
-                                    if (setting.saveHandler != null) setting.saveHandler.accept(setting.inputPlaceholder);
-                                    changed = true;
+                                    if (setting.saveHandler == (Consumer<Object>)(val -> {})) {
+                                        Util.log("No save handler for " + key.replace(" ", "_"));
+                                    } else {
+                                        setting.saveHandler.accept(setting.inputPlaceholder);
+                                        changed = true;
+                                    }
+                                } else if (newPlaceholder.isEmpty()) {
+                                    Util.log(key.replace(" ", "_") + ": Empty value ignored, keeping " + oldValueStr);
                                 }
                                 break;
                             case CHECKBOX:
@@ -106,9 +113,12 @@ public class WebCreator extends NanoHTTPD {
                                 oldValueStr = String.valueOf(setting.checkboxValue != null ? setting.checkboxValue : false);
                                 if (newBool != (setting.checkboxValue != null && setting.checkboxValue)) {
                                     setting.checkboxValue = newBool;
-                                    if (setting.saveHandler != null) setting.saveHandler.accept(setting.checkboxValue);
-                                    else Util.log("No save handler for " + key);
-                                    changed = true;
+                                    if (setting.saveHandler == (Consumer<Object>)(val -> {})) {
+                                        Util.log("No save handler for " + key.replace(" ", "_"));
+                                    } else {
+                                        setting.saveHandler.accept(setting.checkboxValue);
+                                        changed = true;
+                                    }
                                 }
                                 break;
                             case COMBOBOX:
@@ -116,9 +126,12 @@ public class WebCreator extends NanoHTTPD {
                                 oldValueStr = setting.comboData.get(setting.comboIndex);
                                 if (newIndex != -1 && newIndex != setting.comboIndex) {
                                     setting.comboIndex = newIndex;
-                                    if (setting.saveHandler != null) setting.saveHandler.accept(setting.comboData.get(newIndex));
-                                    else Util.log("No save handler for " + key);
-                                    changed = true;
+                                    if (setting.saveHandler == (Consumer<Object>)(val -> {})) {
+                                        Util.log("No save handler for " + key.replace(" ", "_"));
+                                    } else {
+                                        setting.saveHandler.accept(setting.comboData.get(newIndex));
+                                        changed = true;
+                                    }
                                 }
                                 break;
                             case NUMERIC:
@@ -126,9 +139,12 @@ public class WebCreator extends NanoHTTPD {
                                 oldValueStr = String.valueOf(setting.numericValue != null ? setting.numericValue : 0);
                                 if (newNumeric != (setting.numericValue != null ? setting.numericValue : 0)) {
                                     setting.numericValue = newNumeric;
-                                    if (setting.saveHandler != null) setting.saveHandler.accept(setting.numericValue);
-                                    else Util.log("No save handler for " + key);
-                                    changed = true;
+                                    if (setting.saveHandler == (Consumer<Object>)(val -> {})) {
+                                        Util.log("No save handler for " + key.replace(" ", "_"));
+                                    } else {
+                                        setting.saveHandler.accept(setting.numericValue);
+                                        changed = true;
+                                    }
                                 }
                                 break;
                         }

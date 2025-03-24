@@ -11,13 +11,11 @@ import org.nandayo.DAPI.Util;
 
 import java.io.IOException;
 
-import static nesoi.network.api.utils.VersionChecker.getVersion;
-
 public final class NAPI {
 
     private static NAPI napi;
     public final Plugin plugin;
-    public final String version = "1.1.10";
+    public final String version = "1.0.10";
     public static NAPI instance;
 
     private static WebCreator webCreator;
@@ -33,7 +31,7 @@ public final class NAPI {
         // Version Checker
         String latestVersion = VersionChecker.getVersion();
         if (!version.equals(latestVersion)) {
-            Util.log("&c[NAPI] Plugin version (" + version + ") does not match latest release (" + (latestVersion != null ? latestVersion : "unknown") + "). Disabling NAPI.");
+            Util.log("&cVersion (" + version + ") does not match latest release (" + (latestVersion != null ? latestVersion : "Unknown") + "). Disabling NAPI.", "&2https://github.com/aysihuniks/NAPI/releases");
             NAPI.napi = null;
             NAPI.instance = null;
             return;
@@ -44,10 +42,10 @@ public final class NAPI {
 
             for (Setting setting : settings) {
                 Setting.getSettings().add(setting);
-                Util.log("New setting added: " + setting.title + " (" + setting.type.toString().toLowerCase() + ")");
+                Util.log("&aNew setting added: " + setting.title + " (" + setting.type.toString().toLowerCase() + ")");
             }
 
-            Util.log("Loaded " + Setting.getSettings().size() + " settings: " +
+            Util.log("&aLoaded " + Setting.getSettings().size() + " settings: " +
                     String.join(", ", Setting.getSettings().stream().map(s -> s.title).toList()));
         } catch (IOException e) {
             Util.log("&cError occurred while starting NAPI: " + e.getMessage());
@@ -67,7 +65,7 @@ public final class NAPI {
 
     public void disable() {
         if (webCreator != null && webCreator.isAlive()) {
-            Util.log("&6Web Creator shutting down...");
+            Util.log("&eWeb Creator shutting down...");
             webCreator.stop();
             webCreator = null;
         }

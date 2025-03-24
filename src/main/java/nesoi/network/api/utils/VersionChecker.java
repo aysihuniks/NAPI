@@ -3,14 +3,12 @@ package nesoi.network.api.utils;
 import jodd.http.HttpRequest;
 import jodd.http.HttpResponse;
 import org.json.JSONObject;
-import org.nandayo.DAPI.Util;
-
 
 public class VersionChecker {
     public static String getVersion() {
         try {
             HttpRequest request = HttpRequest
-                    .get("https://api.github.com/repos/nesoi/NConfig/releases/latest")
+                    .get("https://api.github.com/repos/nesoi/NAPI/releases/latest")
                     .header("Accept", "application/vnd.github.v3+json");
             HttpResponse response = request.send();
 

@@ -1,6 +1,7 @@
 package nesoi.network.api.model;
 
 import nesoi.network.api.enumeration.SettingType;
+import org.jetbrains.annotations.NotNull;
 import org.nandayo.DAPI.Util;
 
 import java.util.ArrayList;
@@ -28,7 +29,7 @@ public class Setting {
     public Consumer<Object> saveHandler; // Save
 
     // INPUT Constructor
-    public Setting(String title, String description, String placeholder, Consumer<Object> saveHandler) {
+    public Setting(@NotNull String title, @NotNull String description, String placeholder, Consumer<Object> saveHandler) {
         this.title = title;
         this.description = description;
         this.type = SettingType.INPUT;
@@ -39,11 +40,11 @@ public class Setting {
         this.numericValue = null;
         this.minNumeric = null;
         this.maxNumeric = null;
-        this.saveHandler = saveHandler != null ? saveHandler : (val -> Util.log("No save handler for " + title + ": " + val));
+        this.saveHandler = saveHandler != null ? saveHandler : (val -> {});
     }
 
     // CHECKBOX Constructor
-    public Setting(String title, String description, Boolean value, Consumer<Object> saveHandler) {
+    public Setting(@NotNull String title, @NotNull String description, @NotNull Boolean value, Consumer<Object> saveHandler) {
         this.title = title;
         this.description = description;
         this.type = SettingType.CHECKBOX;
@@ -54,11 +55,11 @@ public class Setting {
         this.numericValue = null;
         this.minNumeric = null;
         this.maxNumeric = null;
-        this.saveHandler = saveHandler != null ? saveHandler : (val -> Util.log("No save handler for " + title + ": " + val));
+        this.saveHandler = saveHandler != null ? saveHandler : (val -> {});
     }
 
     // COMBOBOX Constructor
-    public Setting(String title, String description, List<String> data, int startingIndex, Consumer<Object> saveHandler) {
+    public Setting(@NotNull String title, @NotNull String description, @NotNull List<String> data, int startingIndex, Consumer<Object> saveHandler) {
         this.title = title;
         this.description = description;
         this.type = SettingType.COMBOBOX;
@@ -69,11 +70,11 @@ public class Setting {
         this.numericValue = null;
         this.minNumeric = null;
         this.maxNumeric = null;
-        this.saveHandler = saveHandler != null ? saveHandler : (val -> Util.log("No save handler for " + title + ": " + val));
+        this.saveHandler = saveHandler != null ? saveHandler : (val -> {});
     }
 
     // NUMERIC Constructor
-    public Setting(String title, String description, int value, int minValue, int maxValue, Consumer<Object> saveHandler) {
+    public Setting(@NotNull String title, @NotNull String description, int value,  int minValue, int maxValue, Consumer<Object> saveHandler) {
         this.title = title;
         this.description = description;
         this.type = SettingType.NUMERIC;
@@ -84,7 +85,7 @@ public class Setting {
         this.inputPlaceholder = null;
         this.comboData = null;
         this.comboIndex = -1;
-        this.saveHandler = saveHandler != null ? saveHandler : (val -> Util.log("No save handler for " + title + ": " + val));
+        this.saveHandler = saveHandler != null ? saveHandler : (val -> {});
     }
 
     public Setting(String title, String description, String placeholder) {
@@ -122,9 +123,9 @@ public class Setting {
             Integer[] numericData = (Integer[]) value;
             if (numericData.length == 3) {
                 settings.add(new Setting(title, description, numericData[0], numericData[1], numericData[2], saveHandler));
-                Util.log("New setting added: " + title + " (numeric up down)");
+                Util.log("New setting added: " + title + " (numeric)");
             } else {
-                Util.log("&cIncorrect data for NUMERIC_UP_DOWN: " + title + " - waiting [value, min, max]");
+                Util.log("&cIncorrect data for NUMERIC: " + title + " - waiting [value, min, max]");
             }
         } else {
             Util.log("&cIncorrect setting type " + type + " for setting " + title);
