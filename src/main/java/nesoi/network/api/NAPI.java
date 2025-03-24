@@ -1,6 +1,7 @@
 package nesoi.network.api;
 
 import nesoi.network.api.model.Setting;
+import nesoi.network.api.utils.VersionChecker;
 import nesoi.network.api.web.WebCreator;
 import org.bstats.bukkit.Metrics;
 import org.bstats.charts.SimplePie;
@@ -10,21 +11,33 @@ import org.nandayo.DAPI.Util;
 
 import java.io.IOException;
 
+import static nesoi.network.api.utils.VersionChecker.getVersion;
+
 public final class NAPI {
 
+    private static NAPI napi;
     public final Plugin plugin;
-    private final String version = "1.1.10";
+    public final String version = "1.1.10";
     public static NAPI instance;
 
     private static WebCreator webCreator;
 
     public NAPI(@NotNull Plugin plugin, @NotNull Setting... settings) {
-        instance = this;
         this.plugin = plugin;
 
+        // BSTATS & DAPI
         Util.PREFIX = "&8[<#fa8443>NAPI&8]&r ";
         Metrics metrics = new Metrics(plugin, 25222);
         metrics.addCustomChart(new SimplePie("napi_version", () -> version));
+
+        // Version Checker
+        String latestVersion = VersionChecker.getVersion();
+        if (!version.equals(latestVersion)) {
+            Util.log("&c[NAPI] Plugin version (" + version + ") does not match latest release (" + (latestVersion != null ? latestVersion : "unknown") + "). Disabling NAPI.");
+            NAPI.napi = null;
+            NAPI.instance = null;
+            return;
+        }
 
         try {
             webCreator = new WebCreator(plugin);
@@ -40,7 +53,16 @@ public final class NAPI {
             Util.log("&cError occurred while starting NAPI: " + e.getMessage());
         }
 
+        NAPI.napi = this;
+        NAPI.instance = this;
+    }
 
+    public static NAPI getInst() {
+        return instance;
+    }
+
+    public static NAPI getAPI() {
+        return napi;
     }
 
     public void disable() {

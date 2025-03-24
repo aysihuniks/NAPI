@@ -101,5 +101,10 @@
             <artifactId>json</artifactId>
             <version>20231013</version>
         </dependency>
+        <dependency>
+            <groupId>org.jodd</groupId>
+            <artifactId>jodd-http</artifactId>
+            <version>6.2.1</version>
+        </dependency>
     </dependencies>
 </project>
