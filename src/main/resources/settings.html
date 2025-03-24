@@ -125,12 +125,17 @@
             .catch(error => console.error('Error:', error));
     });
 
-    document.querySelectorAll('.dropdown-content a').forEach(item => {
-        item.addEventListener('click', function(event) {
-            if (this.classList.contains('closed')) {
-                event.preventDefault();
+    document.getElementById('resetButton').addEventListener('click', function() {
+        document.querySelectorAll('.form-control, .form-check-input, .custom-select, .numeric-input').forEach(input => {
+            const initialValue = initialValues.get(input.id);
+            if (input.type === 'checkbox') {
+                input.checked = initialValue;
+            } else {
+                input.value = initialValue;
             }
         });
+        document.querySelector(".save-btn").classList.remove('show');
+        document.querySelector(".reset-btn").classList.remove('show');
     });
 
     let initialValues = new Map();
