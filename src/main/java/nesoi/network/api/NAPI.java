@@ -15,7 +15,7 @@ public final class NAPI {
 
     private static NAPI napi;
     public final Plugin plugin;
-    public final String version = "1.0.10";
+    public final String version = "1.0.11";
     public static NAPI instance;
 
     private static WebCreator webCreator;

@@ -8,7 +8,7 @@ public class VersionChecker {
     public static String getVersion() {
         try {
             HttpRequest request = HttpRequest
-                    .get("https://api.github.com/repos/nesoi/NAPI/releases/latest")
+                    .get("https://api.github.com/repos/aysihuniks/NAPI/releases/latest")
                     .header("Accept", "application/vnd.github.v3+json");
             HttpResponse response = request.send();
 
