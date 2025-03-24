@@ -97,10 +97,10 @@ public class WebCreator extends NanoHTTPD {
                                 String newPlaceholder = newValue.toString();
                                 oldValueStr = setting.inputPlaceholder != null ? setting.inputPlaceholder : "";
                                 if (!newPlaceholder.isEmpty() && !newPlaceholder.equals(oldValueStr)) {
-                                    setting.inputPlaceholder = newPlaceholder;
-                                    if (setting.saveHandler == (Consumer<Object>)(val -> {})) {
+                                    if (!setting.hasSaveHandler) {
                                         Util.log("No save handler for " + key.replace(" ", "_"));
                                     } else {
+                                        setting.inputPlaceholder = newPlaceholder;
                                         setting.saveHandler.accept(setting.inputPlaceholder);
                                         changed = true;
                                     }
@@ -112,10 +112,10 @@ public class WebCreator extends NanoHTTPD {
                                 boolean newBool = Boolean.parseBoolean(newValue.toString());
                                 oldValueStr = String.valueOf(setting.checkboxValue != null ? setting.checkboxValue : false);
                                 if (newBool != (setting.checkboxValue != null && setting.checkboxValue)) {
-                                    setting.checkboxValue = newBool;
-                                    if (setting.saveHandler == (Consumer<Object>)(val -> {})) {
+                                    if (!setting.hasSaveHandler) {
                                         Util.log("No save handler for " + key.replace(" ", "_"));
                                     } else {
+                                        setting.checkboxValue = newBool;
                                         setting.saveHandler.accept(setting.checkboxValue);
                                         changed = true;
                                     }
@@ -125,10 +125,10 @@ public class WebCreator extends NanoHTTPD {
                                 int newIndex = setting.comboData.indexOf(newValue.toString());
                                 oldValueStr = setting.comboData.get(setting.comboIndex);
                                 if (newIndex != -1 && newIndex != setting.comboIndex) {
-                                    setting.comboIndex = newIndex;
-                                    if (setting.saveHandler == (Consumer<Object>)(val -> {})) {
+                                    if (!setting.hasSaveHandler) {
                                         Util.log("No save handler for " + key.replace(" ", "_"));
                                     } else {
+                                        setting.comboIndex = newIndex;
                                         setting.saveHandler.accept(setting.comboData.get(newIndex));
                                         changed = true;
                                     }
@@ -138,10 +138,10 @@ public class WebCreator extends NanoHTTPD {
                                 int newNumeric = Integer.parseInt(newValue.toString());
                                 oldValueStr = String.valueOf(setting.numericValue != null ? setting.numericValue : 0);
                                 if (newNumeric != (setting.numericValue != null ? setting.numericValue : 0)) {
-                                    setting.numericValue = newNumeric;
-                                    if (setting.saveHandler == (Consumer<Object>)(val -> {})) {
+                                    if (!setting.hasSaveHandler) {
                                         Util.log("No save handler for " + key.replace(" ", "_"));
                                     } else {
+                                        setting.numericValue = newNumeric;
                                         setting.saveHandler.accept(setting.numericValue);
                                         changed = true;
                                     }

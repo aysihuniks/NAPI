@@ -1,7 +1,7 @@
 package nesoi.network.api.model;
 
 import nesoi.network.api.enumeration.SettingType;
-import org.jetbrains.annotations.NotNull;
+
 import org.nandayo.DAPI.Util;
 
 import java.util.ArrayList;
@@ -26,10 +26,11 @@ public class Setting {
     public Integer maxNumeric; // NumericUpDown
     public Integer minNumeric; // NumericUpDown
 
-    public Consumer<Object> saveHandler; // Save
+    public Consumer<Object> saveHandler;
+    public boolean hasSaveHandler;
 
     // INPUT Constructor
-    public Setting(@NotNull String title, @NotNull String description, String placeholder, Consumer<Object> saveHandler) {
+    public Setting(String title, String description, String placeholder, Consumer<Object> saveHandler) {
         this.title = title;
         this.description = description;
         this.type = SettingType.INPUT;
@@ -41,10 +42,11 @@ public class Setting {
         this.minNumeric = null;
         this.maxNumeric = null;
         this.saveHandler = saveHandler != null ? saveHandler : (val -> {});
+        this.hasSaveHandler = saveHandler != null;
     }
 
     // CHECKBOX Constructor
-    public Setting(@NotNull String title, @NotNull String description, @NotNull Boolean value, Consumer<Object> saveHandler) {
+    public Setting(String title, String description, Boolean value, Consumer<Object> saveHandler) {
         this.title = title;
         this.description = description;
         this.type = SettingType.CHECKBOX;
@@ -56,10 +58,11 @@ public class Setting {
         this.minNumeric = null;
         this.maxNumeric = null;
         this.saveHandler = saveHandler != null ? saveHandler : (val -> {});
+        this.hasSaveHandler = saveHandler != null;
     }
 
     // COMBOBOX Constructor
-    public Setting(@NotNull String title, @NotNull String description, @NotNull List<String> data, int startingIndex, Consumer<Object> saveHandler) {
+    public Setting(String title, String description, List<String> data, int startingIndex, Consumer<Object> saveHandler) {
         this.title = title;
         this.description = description;
         this.type = SettingType.COMBOBOX;
@@ -71,10 +74,11 @@ public class Setting {
         this.minNumeric = null;
         this.maxNumeric = null;
         this.saveHandler = saveHandler != null ? saveHandler : (val -> {});
+        this.hasSaveHandler = saveHandler != null;
     }
 
     // NUMERIC Constructor
-    public Setting(@NotNull String title, @NotNull String description, int value,  int minValue, int maxValue, Consumer<Object> saveHandler) {
+    public Setting(String title, String description, int value, int minValue, int maxValue, Consumer<Object> saveHandler) {
         this.title = title;
         this.description = description;
         this.type = SettingType.NUMERIC;
@@ -86,6 +90,7 @@ public class Setting {
         this.comboData = null;
         this.comboIndex = -1;
         this.saveHandler = saveHandler != null ? saveHandler : (val -> {});
+        this.hasSaveHandler = saveHandler != null;
     }
 
     public Setting(String title, String description, String placeholder) {
@@ -103,6 +108,7 @@ public class Setting {
     public Setting(String title, String description, int value, int minValue, int maxValue) {
         this(title, description, value, minValue, maxValue, null);
     }
+
 
     public static void add(String title, String description, SettingType type, Object value, Consumer<Object> saveHandler) {
         if (type == SettingType.INPUT && value instanceof String) {
