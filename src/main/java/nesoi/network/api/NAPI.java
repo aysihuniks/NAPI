@@ -24,7 +24,7 @@ public final class NAPI {
 
         Util.PREFIX = "&8[<#fa8443>NAPI&8]&r ";
         Metrics metrics = new Metrics(plugin, 25222);
-        metrics.addCustomChart(new SimplePie("NAPI Version", () -> version));
+        metrics.addCustomChart(new SimplePie("napi_version", () -> version));
 
         try {
             webCreator = new WebCreator(plugin);

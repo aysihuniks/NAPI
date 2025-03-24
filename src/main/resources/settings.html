@@ -112,7 +112,16 @@
             headers: { 'Content-Type': 'application/json' },
         })
             .then(response => response.text())
-            .then(data => alert(data))
+            .then(data => {
+                alert(data);
+                if (data === "Settings updated successfully!") {
+                    document.querySelector(".save-btn").classList.remove('show');
+                    document.querySelector(".reset-btn").classList.remove('show');
+                    document.querySelectorAll('.form-control, .form-check-input, .custom-select, .numeric-input').forEach(input => {
+                        initialValues.set(input.id, input.type === 'checkbox' ? input.checked : input.value);
+                    });
+                }
+            })
             .catch(error => console.error('Error:', error));
     });
 
@@ -124,12 +133,13 @@
         });
     });
 
+    let initialValues = new Map();
     document.addEventListener("DOMContentLoaded", function () {
         const saveBtn = document.querySelector(".save-btn");
         const resetBtn = document.querySelector(".reset-btn");
         const inputs = document.querySelectorAll('.form-control, .form-check-input, .custom-select, .numeric-input');
 
-        const initialValues = new Map();
+        initialValues = new Map();
         inputs.forEach(input => {
             initialValues.set(input.id, input.type === 'checkbox' ? input.checked : input.value);
         });
@@ -170,7 +180,6 @@
         });
     });
 </script>
-
 <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.8/dist/umd/popper.min.js" integrity="sha384-I7E8VVD/ismYTF4hNIPjVp/Zjvgyol6VFvRkX/vR+Vc4jQkC+hVqc2pM8ODewa9r" crossorigin="anonymous"></script>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.min.js" integrity="sha384-0pUGZvbkm6XF6gxjEnlmuGrJXVbNuzT9qBBavbLwCsOGabYfZo0T0to5eqruptLy" crossorigin="anonymous"></script>
 </body>

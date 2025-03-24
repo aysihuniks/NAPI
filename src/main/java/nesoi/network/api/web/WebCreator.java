@@ -38,7 +38,8 @@ public class WebCreator extends NanoHTTPD {
                 if (setting.type == SettingType.INPUT) {
                     cards.append("<input type=\"text\" class=\"form-control\" id=\"")
                             .append(setting.title.replace(" ", "_")).append("Input\" placeholder=\"")
-                            .append(setting.inputPlaceholder != null ? setting.inputPlaceholder : "").append("\">");
+                            .append(setting.inputPlaceholder != null ? setting.inputPlaceholder : "").append("\"")
+                            .append(setting.inputPlaceholder != null ? " value=\"" + setting.inputPlaceholder + "\"" : "").append(">");
                 } else if (setting.type == SettingType.CHECKBOX) {
                     cards.append("<div class=\"form-check form-switch\">")
                             .append("<input class=\"form-check-input toggle-input\" type=\"checkbox\" id=\"")
@@ -81,7 +82,6 @@ public class WebCreator extends NanoHTTPD {
             try {
                 String body = new String(session.getInputStream().readNBytes(session.getInputStream().available()), StandardCharsets.UTF_8);
                 JSONObject json = new JSONObject(body);
-                Util.log("Received settings update: " + json.toString());
 
                 boolean hasChanges = false;
                 for (Setting setting : Setting.getSettings()) {
@@ -89,11 +89,13 @@ public class WebCreator extends NanoHTTPD {
                     if (json.has(key)) {
                         Object newValue = json.get(key);
                         boolean changed = false;
+                        String oldValueStr = "";
 
                         switch (setting.type) {
                             case INPUT:
                                 String newPlaceholder = newValue.toString();
-                                if (!newPlaceholder.equals(setting.inputPlaceholder)) {
+                                oldValueStr = setting.inputPlaceholder != null ? setting.inputPlaceholder : "";
+                                if (!newPlaceholder.equals(oldValueStr)) {
                                     setting.inputPlaceholder = newPlaceholder;
                                     if (setting.saveHandler != null) setting.saveHandler.accept(setting.inputPlaceholder);
                                     changed = true;
@@ -101,25 +103,31 @@ public class WebCreator extends NanoHTTPD {
                                 break;
                             case CHECKBOX:
                                 boolean newBool = Boolean.parseBoolean(newValue.toString());
+                                oldValueStr = String.valueOf(setting.checkboxValue != null ? setting.checkboxValue : false);
                                 if (newBool != (setting.checkboxValue != null && setting.checkboxValue)) {
                                     setting.checkboxValue = newBool;
                                     if (setting.saveHandler != null) setting.saveHandler.accept(setting.checkboxValue);
+                                    else Util.log("No save handler for " + key + ": " + newBool);
                                     changed = true;
                                 }
                                 break;
                             case COMBOBOX:
                                 int newIndex = setting.comboData.indexOf(newValue.toString());
+                                oldValueStr = setting.comboData.get(setting.comboIndex);
                                 if (newIndex != -1 && newIndex != setting.comboIndex) {
                                     setting.comboIndex = newIndex;
                                     if (setting.saveHandler != null) setting.saveHandler.accept(setting.comboData.get(newIndex));
+                                    else Util.log("No save handler for " + key + ": " + setting.comboData.get(newIndex));
                                     changed = true;
                                 }
                                 break;
                             case NUMERIC:
                                 int newNumeric = Integer.parseInt(newValue.toString());
+                                oldValueStr = String.valueOf(setting.numericValue != null ? setting.numericValue : 0);
                                 if (newNumeric != (setting.numericValue != null ? setting.numericValue : 0)) {
                                     setting.numericValue = newNumeric;
                                     if (setting.saveHandler != null) setting.saveHandler.accept(setting.numericValue);
+                                    else Util.log("No save handler for " + key + ": " + newNumeric);
                                     changed = true;
                                 }
                                 break;
@@ -127,7 +135,7 @@ public class WebCreator extends NanoHTTPD {
 
                         if (changed) {
                             hasChanges = true;
-                            Util.log("Updated " + key + " to " + newValue);
+                            Util.log(key.replace(" ", "_") + ": " + oldValueStr + " -> " + newValue);
                         }
                     }
                 }
