@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NCore Config Panel</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+    <style>
+        body { background-color: #0f0f0f; color: #e0e0e0; font-family: 'Poppins', sans-serif; margin: 0; padding: 0; overflow-x: hidden; }
+        .navbar { background: linear-gradient(90deg, #1a1a1a, #252525); padding: 20px 40px; box-shadow: 0 4px 12px rgba(0, 0, 0, 0.6); display: flex; align-items: center; justify-content: space-between; position: sticky; top: 0; z-index: 1000; }
+        .navbar-left { display: flex; align-items: center; gap: 20px; }
+        .navbar .logo { font-size: 1.8rem; font-weight: 600; color: #fff; text-transform: uppercase; transition: all 0.3s ease; cursor: pointer; }
+        .navbar .logo:hover { color: #00d4ff; transform: scale(1.05); }
+        .navbar-menu a { color: #e0e0e0; text-decoration: none; font-size: 1.1rem; padding: 8px 16px; transition: all 0.3s ease; }
+        .navbar-menu a:hover { color: #00d4ff; }
+        .dropdown-left, .dropdown-right { position: relative; }
+        .dropdown-content { display: none; position: absolute; background-color: #252525; border-radius: 8px; box-shadow: 0 6px 12px rgba(0, 0, 0, 0.5); min-width: 200px; z-index: 1000; border: 1px solid #00d4ff; opacity: 0; transform: translateY(10px); transition: all 0.3s ease; }
+        .dropdown-left .dropdown-content { left: 0; }
+        .dropdown-right .dropdown-content { right: 0; }
+        .dropdown-content a { color: #e0e0e0; padding: 12px 20px; display: block; text-decoration: none; font-size: 1rem; transition: all 0.3s ease; }
+        .dropdown-content a:hover { background-color: #333; color: #00d4ff; }
+        .dropdown-left:hover .dropdown-content, .dropdown-right:hover .dropdown-content { display: block; opacity: 1; transform: translateY(0); }
+        .dropdown-content a.closed { opacity: 0.5; pointer-events: none; }
+        .profile-icon { font-size: 2rem; color: #e0e0e0; transition: all 0.3s ease; }
+        .profile-icon:hover { color: #00d4ff; }
+        .container { max-width: 1200px; margin: 40px auto; padding: 0 20px; }
+        .card-container { display: flex; flex-wrap: wrap; gap: 25px; justify-content: center; }
+        .card { background-color: #1c1c1c; border-radius: 12px; box-shadow: 0 6px 15px rgba(0, 0, 0, 0.4); width: 100%; max-width: 280px; transition: transform 0.3s ease; }
+        .card:hover { transform: translateY(-5px); }
+        .card-prefix { background: linear-gradient(135deg, #00d4ff, #007acc); padding: 12px; color: #fff; font-weight: 600; text-align: center; border-top-left-radius: 12px; border-top-right-radius: 12px; }
+        .card-content { padding: 20px; text-align: center; display: flex; flex-direction: column; justify-content: flex-start; min-height: 140px; }
+        .card-content p { margin: 0 0 15px; color: #b0b0b0; font-size: 0.95rem; }
+        .form-control { background-color: #252525; border: 1px solid #404040; color: #ffffff; border-radius: 6px; padding: 8px; width: 100%; max-width: 200px; margin: 0 auto; }
+        .form-control::placeholder { color: #e0e0e0; opacity: 0.8; }
+        .form-control:focus { background-color: #252525; border-color: #00d4ff; color: #ffffff; outline: none; box-shadow: 0 0 5px rgba(0, 212, 255, 0.5); }
+        .form-check-input { background-color: #252525; border-color: #404040; }
+        .form-check-input:hover { cursor: pointer; }
+        .form-check-input:checked { background-color: #00d4ff; border-color: #00d4ff; }
+        .form-switch { display: flex; justify-content: center; align-items: center; gap: 10px; }
+        .save-btn, .reset-btn { position: fixed; bottom: 30px; padding: 12px 30px; border-radius: 10px; font-size: 1.1rem; font-weight: 600; box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5); border: none; opacity: 0; transform: scale(0.9); transition: opacity 0.3s ease, transform 0.3s ease; pointer-events: none; }
+        .save-btn.show, .reset-btn.show { opacity: 1; transform: scale(1); pointer-events: auto; }
+        .save-btn { background: linear-gradient(135deg, #5cff77, #00cc44); color: #fff; right: 30px; }
+        .reset-btn { background: linear-gradient(135deg, #ff5c5c, #cc0000); color: #fff; right: 150px; }
+        .save-btn:hover, .reset-btn:hover { cursor: pointer; transform: scale(1.05); box-shadow: 0 6px 18px rgba(0, 0, 0, 0.6); }
+        .custom-select{background-color:#252525;border:2px solid #404040;color:#fff;border-radius:6px;padding:8px 30px 8px 10px;width:100%;max-width:200px;margin:0 auto;font-family:'Poppins',sans-serif;appearance:none;background-image:url('data:image/svg+xml;utf8,<svg fill="%23e0e0e0" height="24" viewBox="0 0 24 24" width="24" xmlns="http://www.w3.org/2000/svg"><path d="M7 10l5 5 5-5z"/></svg>');background-repeat:no-repeat;background-position:right 10px center;cursor:pointer;transition:border-color 0.3s ease,box-shadow 0.3s ease}
+        .custom-select:hover{border-color:#00d4ff}
+        .custom-select:focus{border-color:#00d4ff;outline:none;box-shadow:0 0 8px rgba(0,212,255,0.6)}
+        .custom-select option{background-color:#252525;color:#e0e0e0;padding:10px;border:none;font-size:14px;border-bottom:1px solid #404040}
+        .custom-select::-webkit-scrollbar{width:8px}
+        .custom-select::-webkit-scrollbar-thumb{background:#00d4ff;border-radius:4px}
+        .custom-select::-webkit-scrollbar-track{background:#1c1c1c}
+        .numeric-wrapper{position:relative;display:inline-block;width:100%;max-width:200px;margin:0 auto}
+        .numeric-input{background-color:#252525;border:2px solid #404040;color:#fff;border-radius:6px;padding:8px 30px 8px 10px;width:100%;font-family:'Poppins',sans-serif;text-align:center;-webkit-appearance:none;-moz-appearance:textfield}
+        .numeric-input:focus{border-color:#00d4ff;outline:none;box-shadow:0 0 8px rgba(0,212,255,0.6)}
+        .numeric-input::-webkit-inner-spin-button,.numeric-input::-webkit-outer-spin-button{-webkit-appearance:none;margin:0}
+        .numeric-buttons{position:absolute;right:5px;top:50%;transform:translateY(-50%);display:flex;flex-direction:column;gap:2px}
+        .numeric-up,.numeric-down{width:20px;height:10px;cursor:pointer}
+        .numeric-up{background-image:url('data:image/svg+xml;utf8,<svg fill="%23e0e0e0" height="10" viewBox="0 0 24 24" width="20" xmlns="http://www.w3.org/2000/svg"><path d="M7 14l5-5 5 5z"/></svg>');background-repeat:no-repeat;background-position:center}
+        .numeric-down{background-image:url('data:image/svg+xml;utf8,<svg fill="%23e0e0e0" height="10" viewBox="0 0 24 24" width="20" xmlns="http://www.w3.org/2000/svg"><path d="M7 10l5 5 5-5z"/></svg>');background-repeat:no-repeat;background-position:center;transform:rotate(180deg)}
+        .numeric-up:hover,.numeric-down:hover{background-image:url('data:image/svg+xml;utf8,<svg fill="%2300d4ff" height="10" viewBox="0 0 24 24" width="20" xmlns="http://www.w3.org/2000/svg"><path d="M7 14l5-5 5 5z"/></svg>')}
+        @media (max-width: 768px) { .navbar { padding: 15px 20px; } .navbar-left { flex-direction: column; align-items: flex-start; } .card-container { flex-direction: column; align-items: center; } }
+    </style>
+</head>
+<body>
+<div class="navbar">
+    <div class="navbar-left">
+        <div class="logo">NCore</div>
+        <div class="navbar-menu">
+            <div class="dropdown-left">
+                <a href="#">Plugins</a>
+                <div class="dropdown-content">
+                    <a href="#">NClaim</a>
+                    <a href="#" class="closed">NReport</a>
+                    <a href="#" class="closed">NFriend</a>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="dropdown-right">
+        <i class="bi bi-person-circle profile-icon"></i>
+        <div class="dropdown-content">
+            <a href="#">Settings</a>
+            <hr style="border-color: #404040; margin: 5px 0;">
+            <a href="#" class="closed">Logout</a>
+        </div>
+    </div>
+</div>
+
+<div class="container">
+    <h2 class="text-center mb-4" style="font-weight: 600;">NClaim - Settings</h2>
+    <div class="card-container">
+        <!--SETTINGS_CARDS-->
+    </div>
+</div>
+
+<button id="saveButton" class="save-btn">Save</button>
+<button id="resetButton" class="reset-btn">Set to Default</button>
+
+<script>
+    document.getElementById('saveButton').addEventListener('click', function() {
+        const settings = {};
+        document.querySelectorAll('.form-control, .form-check-input, .custom-select, .numeric-input').forEach(input => {
+            const key = input.id.replace('Input', '').replace('_', ' ');
+            settings[key] = input.type === 'checkbox' ? input.checked : input.value;
+        });
+
+        fetch('/update-config', {
+            method: 'POST',
+            body: JSON.stringify(settings),
+            headers: { 'Content-Type': 'application/json' },
+        })
+            .then(response => response.text())
+            .then(data => alert(data))
+            .catch(error => console.error('Error:', error));
+    });
+
+    document.querySelectorAll('.dropdown-content a').forEach(item => {
+        item.addEventListener('click', function(event) {
+            if (this.classList.contains('closed')) {
+                event.preventDefault();
+            }
+        });
+    });
+
+    document.addEventListener("DOMContentLoaded", function () {
+        const saveBtn = document.querySelector(".save-btn");
+        const resetBtn = document.querySelector(".reset-btn");
+        const inputs = document.querySelectorAll('.form-control, .form-check-input, .custom-select, .numeric-input');
+
+        const initialValues = new Map();
+        inputs.forEach(input => {
+            initialValues.set(input.id, input.type === 'checkbox' ? input.checked : input.value);
+        });
+
+        inputs.forEach(input => {
+            input.addEventListener('change', function() {
+                const hasChanges = Array.from(inputs).some(i => {
+                    const initial = initialValues.get(i.id);
+                    return i.type === 'checkbox' ? i.checked !== initial : i.value !== initial;
+                });
+                saveBtn.classList.toggle('show', hasChanges);
+                resetBtn.classList.toggle('show', hasChanges);
+            });
+        });
+
+        document.querySelectorAll('.numeric-wrapper').forEach(wrapper => {
+            const input = wrapper.querySelector('.numeric-input');
+            const upBtn = wrapper.querySelector('.numeric-up');
+            const downBtn = wrapper.querySelector('.numeric-down');
+            const min = parseInt(input.min);
+            const max = parseInt(input.max);
+
+            upBtn.addEventListener('click', () => {
+                let value = parseInt(input.value);
+                if (value < max) {
+                    input.value = value + 1;
+                    input.dispatchEvent(new Event('change'));
+                }
+            });
+
+            downBtn.addEventListener('click', () => {
+                let value = parseInt(input.value);
+                if (value > min) {
+                    input.value = value - 1;
+                    input.dispatchEvent(new Event('change'));
+                }
+            });
+        });
+    });
+</script>
+
+<script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.8/dist/umd/popper.min.js" integrity="sha384-I7E8VVD/ismYTF4hNIPjVp/Zjvgyol6VFvRkX/vR+Vc4jQkC+hVqc2pM8ODewa9r" crossorigin="anonymous"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.min.js" integrity="sha384-0pUGZvbkm6XF6gxjEnlmuGrJXVbNuzT9qBBavbLwCsOGabYfZo0T0to5eqruptLy" crossorigin="anonymous"></script>
+</body>
+</html>

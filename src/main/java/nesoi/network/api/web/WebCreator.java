@@ -1,10 +1,10 @@
 package nesoi.network.api.web;
 
 import fi.iki.elonen.NanoHTTPD;
-import nesoi.network.api.enumeration.SettingType;
 import nesoi.network.api.model.Setting;
-import org.bukkit.Bukkit;
+import nesoi.network.api.enumeration.SettingType;
 import org.bukkit.plugin.Plugin;
+import org.json.JSONObject;
 import org.nandayo.DAPI.Util;
 
 import java.io.IOException;
@@ -12,47 +12,22 @@ import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
 
 public class WebCreator extends NanoHTTPD {
+
     private final Plugin plugin;
 
     public WebCreator(Plugin plugin) throws IOException {
         super(8080);
         this.plugin = plugin;
-        start(SOCKET_READ_TIMEOUT, false);
-        Util.log("&aWeb Creator started on https://" + Bukkit.getIp() + ":8080/");
+        start(NanoHTTPD.SOCKET_READ_TIMEOUT, false);
     }
 
     @Override
     public Response serve(IHTTPSession session) {
         String uri = session.getUri();
+        Method method = session.getMethod();
 
-        if (uri.equals("/api/players")) {
-            StringBuilder json = new StringBuilder();
-            json.append("{\"players\": [");
-            Bukkit.getOnlinePlayers().forEach(player -> {
-                json.append("\"").append(player.getDisplayName()).append("\",");
-            });
-            String response;
-            if (json.length() > 13) {
-                json.setLength(json.length() - 1);
-                json.append("]}");
-                response = json.toString();
-            } else {
-                response = "{\"players\": []}";
-            }
-            return newFixedLengthResponse(Response.Status.OK, "application/json", response);
-        } else if (uri.equals("/settings")) {
-            String htmlTemplate;
-            try (InputStream is = plugin.getResource("index.html")) {
-                if (is == null) {
-                    Util.log("index.html not found!");
-                    return newFixedLengthResponse("500 - index.html not found");
-                }
-                htmlTemplate = new String(is.readAllBytes(), StandardCharsets.UTF_8);
-            } catch (IOException e) {
-                Util.log("HTML not readable: " + e.getMessage());
-                return newFixedLengthResponse("500 - HTML not readable");
-            }
-
+        if (method == Method.GET && uri.equals("/settings")) {
+            String htmlContent = loadHTMLTemplate("settings.html");
             StringBuilder cards = new StringBuilder();
             Setting.getSettings().forEach(setting -> {
                 cards.append("<div class=\"card\">")
@@ -100,11 +75,88 @@ public class WebCreator extends NanoHTTPD {
                 cards.append("</div>").append("</div>");
             });
 
-            String finalHtml = htmlTemplate.replace("<!--SETTINGS_CARDS-->", cards.toString());
-            return newFixedLengthResponse(Response.Status.OK, "text/html", finalHtml);
+            htmlContent = htmlContent.replace("<!--SETTINGS_CARDS-->", cards.toString());
+            return newFixedLengthResponse(htmlContent);
+        } else if (method == Method.POST && uri.equals("/update-config")) {
+            try {
+                String body = new String(session.getInputStream().readNBytes(session.getInputStream().available()), StandardCharsets.UTF_8);
+                JSONObject json = new JSONObject(body);
+                Util.log("Received settings update: " + json.toString());
+
+                boolean hasChanges = false;
+                for (Setting setting : Setting.getSettings()) {
+                    String key = setting.title;
+                    if (json.has(key)) {
+                        Object newValue = json.get(key);
+                        boolean changed = false;
+
+                        switch (setting.type) {
+                            case INPUT:
+                                String newPlaceholder = newValue.toString();
+                                if (!newPlaceholder.equals(setting.inputPlaceholder)) {
+                                    setting.inputPlaceholder = newPlaceholder;
+                                    if (setting.saveHandler != null) setting.saveHandler.accept(setting.inputPlaceholder);
+                                    changed = true;
+                                }
+                                break;
+                            case CHECKBOX:
+                                boolean newBool = Boolean.parseBoolean(newValue.toString());
+                                if (newBool != (setting.checkboxValue != null && setting.checkboxValue)) {
+                                    setting.checkboxValue = newBool;
+                                    if (setting.saveHandler != null) setting.saveHandler.accept(setting.checkboxValue);
+                                    changed = true;
+                                }
+                                break;
+                            case COMBOBOX:
+                                int newIndex = setting.comboData.indexOf(newValue.toString());
+                                if (newIndex != -1 && newIndex != setting.comboIndex) {
+                                    setting.comboIndex = newIndex;
+                                    if (setting.saveHandler != null) setting.saveHandler.accept(setting.comboData.get(newIndex));
+                                    changed = true;
+                                }
+                                break;
+                            case NUMERIC:
+                                int newNumeric = Integer.parseInt(newValue.toString());
+                                if (newNumeric != (setting.numericValue != null ? setting.numericValue : 0)) {
+                                    setting.numericValue = newNumeric;
+                                    if (setting.saveHandler != null) setting.saveHandler.accept(setting.numericValue);
+                                    changed = true;
+                                }
+                                break;
+                        }
+
+                        if (changed) {
+                            hasChanges = true;
+                            Util.log("Updated " + key + " to " + newValue);
+                        }
+                    }
+                }
+
+                if (hasChanges) {
+                    return newFixedLengthResponse("Settings updated successfully!");
+                } else {
+                    return newFixedLengthResponse("No changes detected.");
+                }
+            } catch (Exception e) {
+                Util.log("&cError updating settings: " + e.getMessage());
+                return newFixedLengthResponse(Response.Status.INTERNAL_ERROR, "text/plain", "Error: " + e.getMessage());
+            }
         }
 
-        return newFixedLengthResponse("404 - Undefined");
+        String notFoundPage = loadHTMLTemplate("404.html");
+        return newFixedLengthResponse(Response.Status.NOT_FOUND, "text/html", notFoundPage);
     }
 
+    private String loadHTMLTemplate(String fileName) {
+        try (InputStream is = plugin.getResource(fileName)) {
+            if (is == null) {
+                Util.log("&cError: " + fileName + " not found in resources!");
+                return "<h1>Error: " + fileName + " not found</h1>";
+            }
+            return new String(is.readAllBytes(), StandardCharsets.UTF_8);
+        } catch (IOException e) {
+            Util.log("&cError loading " + fileName + ": " + e.getMessage());
+            return "<h1>Error loading " + fileName + "</h1>";
+        }
+    }
 }
