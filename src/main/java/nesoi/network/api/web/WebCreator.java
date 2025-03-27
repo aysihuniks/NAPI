@@ -19,8 +19,8 @@ import java.util.UUID;
 public class WebCreator extends NanoHTTPD {
 
     private final Plugin plugin;
-    private final Map<String, String> playerCodes;
-    private final Map<String, Long> playerActivity;
+    private final Map<String, String> playerCodes; // Player: Code
+    private final Map<String, Long> playerActivity; // Player: Last activity
 
     public WebCreator(Plugin plugin, CommandSender sender, Map<String, String> playerCodes, Map<String, Long> playerActivity) throws IOException {
         super(8080);
@@ -35,10 +35,10 @@ public class WebCreator extends NanoHTTPD {
             Player player = (Player) sender;
             String code = playerCodes.getOrDefault(player.getName(), UUID.randomUUID().toString().substring(0, 8));
             playerCodes.put(player.getName(), code);
-            playerActivity.put(player.getName(), System.currentTimeMillis());
+            playerActivity.put(player.getName(), System.currentTimeMillis()); // Initial activity time
             String ip = plugin.getServer().getIp().isEmpty() ? "localhost" : plugin.getServer().getIp();
             player.sendMessage("You can access the site at: https://" + ip + ":8080/" + code);
-            Util.log(" Web Creator started by " + player.getName() + "!");
+            Util.log("&a[NAPI] WebCreator started by " + player.getName() + "!");
         }
 
         start(NanoHTTPD.SOCKET_READ_TIMEOUT, false);
@@ -51,6 +51,7 @@ public class WebCreator extends NanoHTTPD {
 
         String[] uriParts = uri.split("/");
         if (uriParts.length < 2 || !playerCodes.containsValue(uriParts[1])) {
+            Util.log("&c[DEBUG] Invalid or missing access code in URI: " + uri);
             return newFixedLengthResponse(Response.Status.FORBIDDEN, "text/plain", "Invalid or missing access code!");
         }
         String playerName = playerCodes.entrySet().stream()
@@ -59,8 +60,9 @@ public class WebCreator extends NanoHTTPD {
                 .findFirst().orElse("Unknown Player");
 
         playerActivity.put(playerName, System.currentTimeMillis());
+        String normalizedUri = uri.endsWith("/") ? uri.substring(0, uri.length() - 1) : uri;
 
-        if (method == Method.GET && uri.equals("/" + uriParts[1] + "/settings")) {
+        if (method == Method.GET && normalizedUri.equals("/" + uriParts[1] + "/settings")) {
             String htmlContent = loadHTMLTemplate("settings.html");
             StringBuilder cards = new StringBuilder();
             Setting.getSettings().forEach(setting -> {
@@ -112,7 +114,7 @@ public class WebCreator extends NanoHTTPD {
 
             htmlContent = htmlContent.replace("<!--SETTINGS_CARDS-->", cards.toString());
             return newFixedLengthResponse(htmlContent);
-        } else if (method == Method.POST && uri.equals("/" + uriParts[1] + "/update-config")) {
+        } else if (method == Method.POST && normalizedUri.equals("/" + uriParts[1] + "/update-config")) {
             try {
                 String body = new String(session.getInputStream().readNBytes(session.getInputStream().available()), StandardCharsets.UTF_8);
                 JSONObject json = new JSONObject(body);
