@@ -3,6 +3,8 @@ package nesoi.network.api.web;
 import fi.iki.elonen.NanoHTTPD;
 import nesoi.network.api.model.Setting;
 import nesoi.network.api.enumeration.SettingType;
+import org.bukkit.command.CommandSender;
+import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
 import org.json.JSONObject;
 import org.nandayo.DAPI.Util;
@@ -10,15 +12,35 @@ import org.nandayo.DAPI.Util;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
-import java.util.function.Consumer;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.UUID;
 
 public class WebCreator extends NanoHTTPD {
 
     private final Plugin plugin;
+    private final Map<String, String> playerCodes;
+    private final Map<String, Long> playerActivity;
 
-    public WebCreator(Plugin plugin) throws IOException {
+    public WebCreator(Plugin plugin, CommandSender sender, Map<String, String> playerCodes, Map<String, Long> playerActivity) throws IOException {
         super(8080);
         this.plugin = plugin;
+        this.playerCodes = playerCodes != null ? playerCodes : new HashMap<>();
+        this.playerActivity = playerActivity != null ? playerActivity : new HashMap<>();
+
+        if (sender != null) {
+            if (!(sender instanceof Player)) {
+                throw new IOException("WebCreator can only be started by players!");
+            }
+            Player player = (Player) sender;
+            String code = playerCodes.getOrDefault(player.getName(), UUID.randomUUID().toString().substring(0, 8));
+            playerCodes.put(player.getName(), code);
+            playerActivity.put(player.getName(), System.currentTimeMillis());
+            String ip = plugin.getServer().getIp().isEmpty() ? "localhost" : plugin.getServer().getIp();
+            player.sendMessage("You can access the site at: https://" + ip + ":8080/" + code);
+            Util.log(" Web Creator started by " + player.getName() + "!");
+        }
+
         start(NanoHTTPD.SOCKET_READ_TIMEOUT, false);
     }
 
@@ -27,7 +49,18 @@ public class WebCreator extends NanoHTTPD {
         String uri = session.getUri();
         Method method = session.getMethod();
 
-        if (method == Method.GET && uri.equals("/settings")) {
+        String[] uriParts = uri.split("/");
+        if (uriParts.length < 2 || !playerCodes.containsValue(uriParts[1])) {
+            return newFixedLengthResponse(Response.Status.FORBIDDEN, "text/plain", "Invalid or missing access code!");
+        }
+        String playerName = playerCodes.entrySet().stream()
+                .filter(entry -> entry.getValue().equals(uriParts[1]))
+                .map(Map.Entry::getKey)
+                .findFirst().orElse("Unknown Player");
+
+        playerActivity.put(playerName, System.currentTimeMillis());
+
+        if (method == Method.GET && uri.equals("/" + uriParts[1] + "/settings")) {
             String htmlContent = loadHTMLTemplate("settings.html");
             StringBuilder cards = new StringBuilder();
             Setting.getSettings().forEach(setting -> {
@@ -79,7 +112,7 @@ public class WebCreator extends NanoHTTPD {
 
             htmlContent = htmlContent.replace("<!--SETTINGS_CARDS-->", cards.toString());
             return newFixedLengthResponse(htmlContent);
-        } else if (method == Method.POST && uri.equals("/update-config")) {
+        } else if (method == Method.POST && uri.equals("/" + uriParts[1] + "/update-config")) {
             try {
                 String body = new String(session.getInputStream().readNBytes(session.getInputStream().available()), StandardCharsets.UTF_8);
                 JSONObject json = new JSONObject(body);
@@ -151,7 +184,7 @@ public class WebCreator extends NanoHTTPD {
 
                         if (changed) {
                             hasChanges = true;
-                            Util.log(key.replace(" ", "_") + ": " + oldValueStr + " -> " + newValue);
+                            Util.log(playerName + " changed " + key.replace(" ", "_") + ": " + oldValueStr + " -> " + newValue);
                         }
                     }
                 }
