@@ -41,6 +41,7 @@ public class WebCreator extends NanoHTTPD {
             String ip = plugin.getServer().getIp().isEmpty() ? "localhost" : plugin.getServer().getIp();
             TextComponent message = new TextComponent("You can access the site at: https://" + ip + ":" + port + "/" + code + "/settings");
             message.setClickEvent(new ClickEvent(ClickEvent.Action.OPEN_URL, "https://" + ip + ":" + port + "/" + code + "/settings"));
+            player.spigot().sendMessage(message);
             Util.log("WebCreator started by " + player.getName() + "!");
         }
 

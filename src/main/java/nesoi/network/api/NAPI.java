@@ -73,8 +73,6 @@ public final class NAPI {
                     code = UUID.randomUUID().toString().substring(0, 8);
                     playerCodes.put(player.getName(), code);
                 }
-                String ip = plugin.getServer().getIp().isEmpty() ? "localhost" : plugin.getServer().getIp();
-                tell(player, "You can access the site by entering https://" + ip + ":8080/" + code);
             } else {
                 Util.log("&cThis command is only available to players at the moment.");
             }
