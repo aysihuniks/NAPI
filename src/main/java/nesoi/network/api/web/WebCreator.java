@@ -3,6 +3,8 @@ package nesoi.network.api.web;
 import fi.iki.elonen.NanoHTTPD;
 import nesoi.network.api.model.Setting;
 import nesoi.network.api.enumeration.SettingType;
+import net.md_5.bungee.api.chat.ClickEvent;
+import net.md_5.bungee.api.chat.TextComponent;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
@@ -22,8 +24,8 @@ public class WebCreator extends NanoHTTPD {
     private final Map<String, String> playerCodes; // Player: Code
     private final Map<String, Long> playerActivity; // Player: Last activity
 
-    public WebCreator(Plugin plugin, CommandSender sender, Map<String, String> playerCodes, Map<String, Long> playerActivity) throws IOException {
-        super(8080);
+    public WebCreator(Plugin plugin, CommandSender sender, int port, Map<String, String> playerCodes, Map<String, Long> playerActivity) throws IOException {
+        super(port);
         this.plugin = plugin;
         this.playerCodes = playerCodes != null ? playerCodes : new HashMap<>();
         this.playerActivity = playerActivity != null ? playerActivity : new HashMap<>();
@@ -35,10 +37,11 @@ public class WebCreator extends NanoHTTPD {
             Player player = (Player) sender;
             String code = playerCodes.getOrDefault(player.getName(), UUID.randomUUID().toString().substring(0, 8));
             playerCodes.put(player.getName(), code);
-            playerActivity.put(player.getName(), System.currentTimeMillis()); // Initial activity time
+            playerActivity.put(player.getName(), System.currentTimeMillis());
             String ip = plugin.getServer().getIp().isEmpty() ? "localhost" : plugin.getServer().getIp();
-            player.sendMessage("You can access the site at: https://" + ip + ":8080/" + code);
-            Util.log("&a[NAPI] WebCreator started by " + player.getName() + "!");
+            TextComponent message = new TextComponent("You can access the site at: https://" + ip + ":" + port + "/" + code + "/settings");
+            message.setClickEvent(new ClickEvent(ClickEvent.Action.OPEN_URL, "https://" + ip + ":" + port + "/" + code + "/settings"));
+            Util.log("WebCreator started by " + player.getName() + "!");
         }
 
         start(NanoHTTPD.SOCKET_READ_TIMEOUT, false);
@@ -51,7 +54,7 @@ public class WebCreator extends NanoHTTPD {
 
         String[] uriParts = uri.split("/");
         if (uriParts.length < 2 || !playerCodes.containsValue(uriParts[1])) {
-            Util.log("&c[DEBUG] Invalid or missing access code in URI: " + uri);
+            Util.log("Invalid or missing access code in URI: " + uri);
             return newFixedLengthResponse(Response.Status.FORBIDDEN, "text/plain", "Invalid or missing access code!");
         }
         String playerName = playerCodes.entrySet().stream()

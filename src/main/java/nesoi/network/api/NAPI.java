@@ -40,13 +40,13 @@ public final class NAPI {
 
         String latestVersion = VersionChecker.getVersion();
         if (!version.equals(latestVersion)) {
-            Util.log("&c[NAPI] Plugin version (" + version + ") does not match latest release (" + (latestVersion != null ? latestVersion : "unknown") + "). Disabling NAPI.");
+            Util.log("&cPlugin version (" + version + ") does not match latest release (" + (latestVersion != null ? latestVersion : "unknown") + "). Disabling NAPI.");
             NAPI.napi = null;
             NAPI.instance = null;
             return;
         }
 
-        Util.log("&a[NAPI] Plugin version (" + version + ") is up-to-date with latest release (" + latestVersion + ").");
+        Util.log("&aPlugin version (" + version + ") is up-to-date with latest release (" + latestVersion + ").");
 
         for (Setting setting : settings) {
             Setting.getSettings().add(setting);
@@ -65,7 +65,7 @@ public final class NAPI {
         }.runTaskTimerAsynchronously(plugin, 20 * 60, 20 * 60);
     }
 
-    public void start(@NotNull CommandSender sender) {
+    public void start(@NotNull CommandSender sender, int port) {
         if (webCreator != null && webCreator.isAlive()) {
             if (sender instanceof Player player) {
                 String code = playerCodes.get(player.getName());
@@ -81,10 +81,12 @@ public final class NAPI {
             return;
         }
 
+
+
         try {
-            webCreator = new WebCreator(plugin, sender, playerCodes, playerActivity);
+            webCreator = new WebCreator(plugin, sender, port, playerCodes, playerActivity);
         } catch (IOException e) {
-            Util.log(" Error starting Web Creator " + e.getMessage());
+            Util.log("Error starting Web Creator " + e.getMessage());
             if (sender instanceof Player) {
                 tell(sender, Util.PREFIX + "A error occurred while trying to starting website.");
             }
